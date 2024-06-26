@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-2xnc$#2b717i3&_vz0ga(e5l^2kdx8&pk@rgdmx)2ho*hyx65q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -39,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_bootstrap5'
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +134,11 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_FAILURE_VIEW = 'pages/403csrf.html'
-PAGE_NOT_FOUND_VIEW = 'pages/404.html'
-SERVER_ERROR_VIEW = 'pages/500.html'
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+HANDLER404 = 'django.views.defaults.page_not_found'
+HANDLER500 = 'django.views.defaults.server_error'
+
+LOGIN_REDIRECT_URL = 'blog:index'
+LOGIN_URL = 'login'
+
+MEDIA_ROOT = BASE_DIR / 'media'
