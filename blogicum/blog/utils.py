@@ -16,13 +16,20 @@ def get_posts(user=None, include_unpublished=False):
     if user and user.is_authenticated:
         if include_unpublished:
             queryset = base_queryset.filter(
-                Q(is_published=True, category__is_published=True, pub_date__lte=now) |
-                Q(author=user)
+                Q(is_published=True,
+                  category__is_published=True,
+                  pub_date__lte=now)
+                | Q(author=user)
             )
         else:
             queryset = base_queryset.filter(
-                Q(is_published=True, category__is_published=True, pub_date__lte=now) |
-                Q(author=user, is_published=True, category__is_published=True, pub_date__lte=now)
+                Q(is_published=True,
+                  category__is_published=True,
+                  pub_date__lte=now)
+                | Q(author=user,
+                    is_published=True,
+                    category__is_published=True,
+                    pub_date__lte=now)
             )
     else:
         queryset = base_queryset.filter(

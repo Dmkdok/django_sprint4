@@ -17,6 +17,7 @@ from .utils import get_posts
 
 User = get_user_model()
 
+
 class PaginateMixin:
     paginate_by = 10
 
@@ -38,7 +39,10 @@ class CommentMixin(LoginRequiredMixin):
     pk_url_kwarg = 'comment_id'
 
     def get_success_url(self):
-        return reverse('blog:post_detail', kwargs={'post_id': self.kwargs['post_id']})
+        return reverse(
+            'blog:post_detail',
+            kwargs={'post_id': self.kwargs['post_id']}
+        )
 
 
 class IndexView(PaginateMixin, PostQuerysetMixin, ListView):
@@ -71,7 +75,8 @@ class CategoryListView(PaginateMixin, PostQuerysetMixin, ListView):
     context_object_name = 'post_list'
 
     def get_queryset(self):
-        self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'], is_published=True)
+        self.category = get_object_or_404(
+            Category, slug=self.kwargs['category_slug'], is_published=True)
         return super().get_queryset().filter(category=self.category)
 
     def get_context_data(self, **kwargs):
@@ -101,6 +106,7 @@ class ProfileListView(PaginateMixin, ListView):
             username=self.kwargs['username'])
         return context
 
+
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     template_name = 'blog/user.html'
@@ -123,28 +129,35 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('blog:profile', kwargs={'username': self.request.user.username})
-    
+        return reverse_lazy(
+            'blog:profile',
+            kwargs={'username': self.request.user.username}
+        )
+
+
 class PostUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/create.html'
     pk_url_kwarg = 'post_id'
-    
+
     def handle_no_permission(self):
         post = self.get_object()
         return redirect('blog:post_detail', post_id=post.id)
-    
+
     def get_success_url(self):
-        return reverse_lazy('blog:post_detail', kwargs={'post_id': self.object.id})
-    
+        return reverse_lazy(
+            'blog:post_detail',
+            kwargs={'post_id': self.object.id}
+        )
+
 
 class PostDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
     model = Post
     template_name = 'blog/create.html'
     pk_url_kwarg = 'post_id'
     success_url = reverse_lazy('blog:index')
-    
+
     def handle_no_permission(self):
         post = self.get_object()
         return redirect('blog:post_detail', post_id=post.id)

@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from .helpers import truncate_string
@@ -6,7 +7,7 @@ from .helpers import truncate_string
 User = get_user_model()
 
 TEXT_LENGTH = 256
-TITLE_LENGTH = 15
+TITLE_LENGTH = 20
 
 
 class BlogBaseModel(models.Model):
@@ -59,9 +60,10 @@ class Post(BlogBaseModel):
     image = models.ImageField(
         upload_to='post_images',
         blank=True, null=True,
-        verbose_name='Изображение'
+        verbose_name='Изображение',
+        validators=[FileExtensionValidator(
+            allowed_extensions=['jpg', 'png', 'gif'])]
     )
-
 
     class Meta:
         default_related_name = 'post'
@@ -106,11 +108,15 @@ class Location(BlogBaseModel):
     def __str__(self):
         return truncate_string(self.name, TITLE_LENGTH)
 
+
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name='Публикация')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор комментария')
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, verbose_name='Публикация')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name='Автор комментария')
     text = models.TextField(verbose_name='Текст комментария')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Опубликовано')
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Опубликовано')
 
     class Meta:
         default_related_name = 'comments'
@@ -120,4 +126,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Комментарий {self.author}'
-    
