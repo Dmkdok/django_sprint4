@@ -1,11 +1,7 @@
 from django.contrib import admin
 
-from .helpers import truncate_string
-from .models import (
-    Category,
-    Location,
-    Post,
-)
+from .mixins import TruncatedTextMixin
+from .models import Category, Comment, Location, Post
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -31,7 +27,7 @@ class LocationAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(TruncatedTextMixin, admin.ModelAdmin):
     list_display = (
         'title',
         'truncated_text',
@@ -49,13 +45,14 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'text')
     list_per_page = 20
 
-    def truncated_text(self, post):
-        return truncate_string(post.text, 100)
-    truncated_text.short_description = (
-        Post._meta.get_field('text').verbose_name
-    )
+
+class CommentAdmin(TruncatedTextMixin, admin.ModelAdmin):
+    list_display = ('author', 'post', 'truncated_text', 'created_at')
+    list_filter = ('created_at', 'author', 'post')
+    search_fields = ('text', 'author', 'post')
 
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Post, PostAdmin)
+admin.site.register(Comment, CommentAdmin)
